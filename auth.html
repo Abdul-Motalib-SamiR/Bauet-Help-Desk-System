@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAUET Help Desk | Login & Register</title>
+  <link rel="icon" type="image/png" href="assets/images/bauet-logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+Bengali:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/auth.css"/>
+</head>
+<body>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast">
+    <div class="toast-title" id="toast-title"></div>
+    <div class="toast-msg" id="toast-msg"></div>
+  </div>
+
+  <!-- Final success overlay -->
+  <div class="success-overlay" id="success-overlay">
+    <div class="success-icon">✅</div>
+    <div class="success-title" id="success-title"></div>
+    <p class="success-msg" id="success-msg"></p>
+    <button class="success-btn" id="success-btn">Continue</button>
+  </div>
+
+  <div class="auth-layout">
+
+    <!-- ═══════════════════ LEFT PANEL ═══════════════════ -->
+    <div class="panel-left">
+      <div class="left-top">
+        <a href="index.html" class="back-link">
+          ← <span class="en-inline">Back to Home</span><span class="bn-inline">হোমে ফিরুন</span>
+        </a>
+        <div class="lang-toggle">
+          <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" id="btn-bn" onclick="setLang('bn')">বাং</button>
+        </div>
+      </div>
+
+      <div class="left-brand">
+        <div class="seal-container">
+          <img src="assets/images/bauet-logo.png" alt="BAUET Official Seal"/>
+        </div>
+        <div class="brand-title">BAUET</div>
+        <div class="brand-sub">
+          <span class="en-inline">Help Desk System</span>
+          <span class="bn-inline">হেল্প ডেস্ক সিস্টেম</span>
+        </div>
+        <div class="brand-desc">
+          <span class="en-inline">Bangladesh Army University of Engineering &amp; Technology's official student support and issue tracking platform.</span>
+          <span class="bn-inline">বাউয়েটের অফিসিয়াল শিক্ষার্থী সহায়তা ও সমস্যা ট্র্যাকিং প্ল্যাটফর্ম।</span>
+        </div>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-card-icon">🔒</div>
+            <div class="info-card-text">
+              <span class="en-inline">Email OTP verification on every login &amp; registration</span>
+              <span class="bn-inline">প্রতিটি লগইন ও নিবন্ধনে ইমেইল OTP যাচাইকরণ</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">🛡️</div>
+            <div class="info-card-text">
+              <span class="en-inline">Officer / Authority / Admin roles require admin approval</span>
+              <span class="bn-inline">অফিসার / কর্তৃপক্ষ / অ্যাডমিন ভূমিকার জন্য অনুমোদন প্রয়োজন</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">🌐</div>
+            <div class="info-card-text">
+              <span class="en-inline">Available in English and Bengali (বাংলা)</span>
+              <span class="bn-inline">ইংরেজি ও বাংলায় উপলব্ধ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="left-bottom">BAUET · NATORE · BANGLADESH · ★</div>
+    </div>
+
+    <!-- ═══════════════════ RIGHT PANEL ═══════════════════ -->
+    <div class="panel-right">
+
+      <!-- Mobile-only header (shown on small screens via JS) -->
+      <div style="display:none; align-items:center; justify-content:space-between; margin-bottom:32px;" id="mobile-header">
+        <a href="index.html" style="font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:2px; color:rgba(200,168,75,0.6); text-decoration:none;">← BACK</a>
+        <div class="lang-toggle">
+          <button class="lang-btn active" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" onclick="setLang('bn')">বাং</button>
+        </div>
+      </div>
+
+      <!-- Tabs (hidden when OTP or pending screen is shown) -->
+      <div class="auth-tabs" id="auth-tabs">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">
+          <span class="en-inline">Sign In</span>
+          <span class="bn-inline">সাইন ইন</span>
+        </button>
+        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">
+          <span class="en-inline">Create Account</span>
+          <span class="bn-inline">অ্যাকাউন্ট তৈরি</span>
+        </button>
+      </div>
+
+      <div class="form-wrapper">
+
+        <!-- ───── LOGIN FORM ───── -->
+        <div class="form-panel active" id="panel-login">
+          <div class="form-header">
+            <div class="form-title">
+              <span class="en-inline">Welcome Back</span>
+              <span class="bn-inline">আবার স্বাগতম</span>
+            </div>
+            <div class="form-subtitle">
+              <span class="en-inline">Sign in — an OTP will be sent to your email</span>
+              <span class="bn-inline">সাইন ইন করুন — আপনার ইমেইলে OTP পাঠানো হবে</span>
+            </div>
+          </div>
+
+          <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="field-group">
+              <label>
+                <span class="en-inline">Email Address</span>
+                <span class="bn-inline">ইমেইল ঠিকানা</span>
+              </label>
+              <input type="email" id="login-email" placeholder="student@bauet.ac.bd" required autocomplete="email"/>
+            </div>
+            <div class="field-group">
+              <label>
+                <span class="en-inline">Password</span>
+                <span class="bn-inline">পাসওয়ার্ড</span>
+              </label>
+              <div class="password-wrapper">
+                <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password"/>
+                <button type="button" class="toggle-pass" onclick="togglePass('login-password', this)">👁</button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-login">
+              <span class="btn-text">
+                <span class="en-inline">Send OTP &amp; Continue</span>
+                <span class="bn-inline">OTP পাঠান এবং চালিয়ে যান</span>
+              </span>
+              <div class="spinner"></div>
+            </button>
+          </form>
+
+          <div class="or-divider">
+            <div class="or-line"></div>
+            <div class="or-text"><span class="en-inline">New here?</span><span class="bn-inline">নতুন?</span></div>
+            <div class="or-line"></div>
+          </div>
+          <div class="switch-text">
+            <span class="en-inline">Don't have an account? <span class="switch-link" onclick="switchTab('register')">Create one</span></span>
+            <span class="bn-inline">অ্যাকাউন্ট নেই? <span class="switch-link" onclick="switchTab('register')">তৈরি করুন</span></span>
+          </div>
+        </div>
+
+        <!-- ───── REGISTER FORM ───── -->
+        <div class="form-panel" id="panel-register">
+          <div class="form-header">
+            <div class="form-title">
+              <span class="en-inline">Create Account</span>
+              <span class="bn-inline">অ্যাকাউন্ট তৈরি করুন</span>
+            </div>
+            <div class="form-subtitle">
+              <span class="en-inline">Join BAUET Help Desk — OTP sent after submission</span>
+              <span class="bn-inline">বাউয়েট হেল্প ডেস্কে যোগ দিন — জমা দেওয়ার পরে OTP পাঠানো হবে</span>
+            </div>
+          </div>
+
+          <form id="register-form" onsubmit="handleRegister(event)">
+            <div class="field-row">
+              <div class="field-group">
+                <label><span class="en-inline">First Name</span><span class="bn-inline">প্রথম নাম</span></label>
+                <input type="text" id="reg-firstname" placeholder="Md. Rafiq" required/>
+              </div>
+              <div class="field-group">
+                <label><span class="en-inline">Last Name</span><span class="bn-inline">শেষ নাম</span></label>
+                <input type="text" id="reg-lastname" placeholder="Ahmed" required/>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label><span class="en-inline">Email Address</span><span class="bn-inline">ইমেইল ঠিকানা</span></label>
+              <input type="email" id="reg-email" placeholder="student@bauet.ac.bd" required autocomplete="email"/>
+              <div class="field-hint">
+                <span class="en-inline">Use your university email if available</span>
+                <span class="bn-inline">পাওয়া গেলে বিশ্ববিদ্যালয়ের ইমেইল ব্যবহার করুন</span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label><span class="en-inline">Student / Staff ID</span><span class="bn-inline">শিক্ষার্থী / কর্মী আইডি</span></label>
+              <input type="text" id="reg-student-id" placeholder="e.g. CSE-2023-001" required/>
+            </div>
+
+            <!-- Role selector -->
+            <span class="role-selector-label">
+              <span class="en-inline">Select Role</span>
+              <span class="bn-inline">ভূমিকা নির্বাচন করুন</span>
+            </span>
+            <div class="role-selector">
+              <div>
+                <input type="radio" class="role-option" name="role" id="role-student" value="student" checked/>
+                <label class="role-label" for="role-student">
+                  <span class="role-icon">🎓</span>
+                  <div class="role-text">
+                    <span class="r-name"><span class="en-inline">Student</span><span class="bn-inline">শিক্ষার্থী</span></span>
+                    <span class="r-sub"><span class="en-inline">Instant access</span><span class="bn-inline">তাৎক্ষণিক প্রবেশ</span></span>
+                  </div>
+                </label>
+              </div>
+              <div>
+                <input type="radio" class="role-option" name="role" id="role-officer" value="officer"/>
+                <label class="role-label" for="role-officer">
+                  <span class="role-icon">🛡️</span>
+                  <div class="role-text">
+                    <span class="r-name"><span class="en-inline">Officer</span><span class="bn-inline">অফিসার</span></span>
+                    <span class="r-sub"><span class="en-inline">Needs approval</span><span class="bn-inline">অনুমোদন প্রয়োজন</span></span>
+                  </div>
+                  <span class="role-restricted-badge">Admin</span>
+                </label>
+              </div>
+              <div>
+                <input type="radio" class="role-option" name="role" id="role-authority" value="authority"/>
+                <label class="role-label" for="role-authority">
+                  <span class="role-icon">🏛️</span>
+                  <div class="role-text">
+                    <span class="r-name"><span class="en-inline">Authority</span><span class="bn-inline">কর্তৃপক্ষ</span></span>
+                    <span class="r-sub"><span class="en-inline">Needs approval</span><span class="bn-inline">অনুমোদন প্রয়োজন</span></span>
+                  </div>
+                  <span class="role-restricted-badge">Admin</span>
+                </label>
+              </div>
+              <div>
+                <input type="radio" class="role-option" name="role" id="role-admin" value="admin"/>
+                <label class="role-label" for="role-admin">
+                  <span class="role-icon">⚙️</span>
+                  <div class="role-text">
+                    <span class="r-name"><span class="en-inline">Admin</span><span class="bn-inline">অ্যাডমিন</span></span>
+                    <span class="r-sub"><span class="en-inline">Needs approval</span><span class="bn-inline">অনুমোদন প্রয়োজন</span></span>
+                  </div>
+                  <span class="role-restricted-badge">Admin</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label><span class="en-inline">Password</span><span class="bn-inline">পাসওয়ার্ড</span></label>
+              <div class="password-wrapper">
+                <input type="password" id="reg-password" placeholder="Min. 8 characters" required autocomplete="new-password" minlength="8"/>
+                <button type="button" class="toggle-pass" onclick="togglePass('reg-password', this)">👁</button>
+              </div>
+              <div class="field-hint">
+                <span class="en-inline">Minimum 8 characters</span>
+                <span class="bn-inline">সর্বনিম্ন ৮টি অক্ষর</span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label><span class="en-inline">Confirm Password</span><span class="bn-inline">পাসওয়ার্ড নিশ্চিত করুন</span></label>
+              <div class="password-wrapper">
+                <input type="password" id="reg-confirm" placeholder="Re-enter password" required autocomplete="new-password"/>
+                <button type="button" class="toggle-pass" onclick="togglePass('reg-confirm', this)">👁</button>
+              </div>
+              <div class="field-error" id="reg-confirm-err">
+                <span class="en-inline">Passwords do not match.</span>
+                <span class="bn-inline">পাসওয়ার্ড মেলেনি।</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-register">
+              <span class="btn-text">
+                <span class="en-inline">Create Account &amp; Send OTP</span>
+                <span class="bn-inline">অ্যাকাউন্ট তৈরি করুন এবং OTP পাঠান</span>
+              </span>
+              <div class="spinner"></div>
+            </button>
+          </form>
+
+          <div class="switch-text" style="margin-top:20px;">
+            <span class="en-inline">Already have an account? <span class="switch-link" onclick="switchTab('login')">Sign in</span></span>
+            <span class="bn-inline">ইতিমধ্যে অ্যাকাউন্ট আছে? <span class="switch-link" onclick="switchTab('login')">সাইন ইন করুন</span></span>
+          </div>
+        </div>
+
+        <!-- ───── OTP VERIFICATION STEP ───── -->
+        <div class="otp-step" id="otp-step">
+          <div class="otp-header">
+            <div class="otp-title">
+              <span class="en-inline">Check Your Email</span>
+              <span class="bn-inline">আপনার ইমেইল চেক করুন</span>
+            </div>
+            <p class="otp-subtitle">
+              <span class="en-inline">We sent a 6-digit code to <span class="otp-email-display" id="otp-email-display"></span>. Enter it below to continue.</span>
+              <span class="bn-inline"><span class="otp-email-display" id="otp-email-display-bn"></span> এ একটি ৬-সংখ্যার কোড পাঠানো হয়েছে। চালিয়ে যেতে নিচে লিখুন।</span>
+            </p>
+          </div>
+
+          <div class="otp-boxes" id="otp-boxes">
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" id="otp-0"/>
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" id="otp-1"/>
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" id="otp-2"/>
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" id="otp-3"/>
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" id="otp-4"/>
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" id="otp-5"/>
+          </div>
+
+          <div class="otp-timer">
+            <span class="en-inline">Code expires in <span class="timer-count" id="otp-timer-count">10:00</span></span>
+            <span class="bn-inline">কোডের মেয়াদ শেষ হবে <span class="timer-count" id="otp-timer-count-bn">10:00</span></span>
+            <span class="timer-expired" id="otp-timer-expired">
+              <span class="en-inline">Code expired.</span>
+              <span class="bn-inline">কোডের মেয়াদ শেষ।</span>
+            </span>
+          </div>
+
+          <div class="otp-resend">
+            <button class="resend-btn" id="resend-btn" onclick="resendOtp()" disabled>
+              <span class="en-inline">Resend Code</span>
+              <span class="bn-inline">কোড পুনরায় পাঠান</span>
+            </button>
+          </div>
+
+          <button class="btn-submit" id="btn-verify-otp" onclick="verifyOtp()">
+            <span class="btn-text">
+              <span class="en-inline">Verify &amp; Continue</span>
+              <span class="bn-inline">যাচাই করুন এবং চালিয়ে যান</span>
+            </span>
+            <div class="spinner"></div>
+          </button>
+
+          <button class="otp-back-btn" onclick="cancelOtp()">
+            ← <span class="en-inline">Go back</span><span class="bn-inline">ফিরে যান</span>
+          </button>
+        </div>
+
+        <!-- ───── ROLE REQUEST PENDING SCREEN ───── -->
+        <div class="pending-screen" id="pending-screen">
+          <div class="pending-icon">⏳</div>
+          <div class="pending-title">
+            <span class="en-inline">Request Submitted</span>
+            <span class="bn-inline">অনুরোধ জমা দেওয়া হয়েছে</span>
+          </div>
+          <p class="pending-msg">
+            <span class="en-inline">Your account has been created as a Student. Your request for elevated access has been forwarded to the administrator.</span>
+            <span class="bn-inline">আপনার অ্যাকাউন্ট শিক্ষার্থী হিসেবে তৈরি হয়েছে। উন্নত প্রবেশাধিকারের অনুরোধ অ্যাডমিনিস্ট্রেটরের কাছে পাঠানো হয়েছে।</span>
+          </p>
+          <div class="pending-role-badge" id="pending-role-badge">Officer Access</div>
+          <div class="pending-info">
+            <p>
+              <span class="en-inline">The administrator will review your request and update your role. You will be able to log in with Student access immediately. Your role will be upgraded once approved.</span>
+              <span class="bn-inline">অ্যাডমিনিস্ট্রেটর আপনার অনুরোধ পর্যালোচনা করে ভূমিকা আপডেট করবেন। আপনি এখনই শিক্ষার্থী হিসেবে লগইন করতে পারবেন। অনুমোদনের পরে আপনার ভূমিকা আপগ্রেড করা হবে।</span>
+            </p>
+          </div>
+          <button class="pending-login-btn" onclick="switchTab('login'); showFormArea();">
+            <span class="en-inline">Sign In Now</span>
+            <span class="bn-inline">এখন সাইন ইন করুন</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

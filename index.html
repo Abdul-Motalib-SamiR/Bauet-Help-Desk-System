@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAUET Help Desk | Bangladesh Army University</title>
+  <link rel="icon" type="image/png" href="assets/images/bauet-logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+Bengali:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body class="lang-en">
+
+  <div class="lang-bar">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btn-bn" onclick="setLang('bn')">বাং</button>
+    </div>
+  </div>
+
+  <nav id="navbar">
+    <div class="nav-logo">
+      <div class="logo-emblem">
+        <img src="assets/images/bauet-logo.png" alt="BAUET Logo"/>
+      </div>
+      <div class="logo-text">
+        <div class="main">BAUET</div>
+        <div class="sub en-inline">Help Desk System</div>
+        <div class="sub bn-inline">হেল্প ডেস্ক সিস্টেম</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#about" class="en-inline">About</a>
+      <a href="#about" class="bn-inline">পরিচিতি</a>
+      <a href="#modules" class="en-inline">Modules</a>
+      <a href="#modules" class="bn-inline">মডিউল</a>
+      <a href="#how" class="en-inline">How It Works</a>
+      <a href="#how" class="bn-inline">কিভাবে কাজ করে</a>
+      <a href="#categories" class="en-inline">Categories</a>
+      <a href="#categories" class="bn-inline">বিভাগসমূহ</a>
+    </div>
+    <div class="nav-cta">
+      <a href="auth.html" class="btn btn-outline">
+        <span class="en-inline">Login</span>
+        <span class="bn-inline">লগইন</span>
+      </a>
+      <a href="auth.html?tab=register" class="btn btn-gold">
+        <span class="en-inline">Register</span>
+        <span class="bn-inline">নিবন্ধন</span>
+      </a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="en-inline">Bangladesh Army University of Engineering &amp; Technology</span>
+        <span class="bn-inline">বাংলাদেশ আর্মি ইউনিভার্সিটি অব ইঞ্জিনিয়ারিং অ্যান্ড টেকনোলজি</span>
+      </div>
+      <h1>
+        <span class="en-inline">Student <span class="highlight">Help Desk</span><br/>Support System</span>
+        <span class="bn-inline">শিক্ষার্থী <span class="highlight">হেল্প ডেস্ক</span><br/>সহায়তা সিস্টেম</span>
+      </h1>
+      <p class="hero-desc">
+        <span class="en-inline">A centralized digital platform for BAUET students to submit queries, track issues, and access official information efficiently and transparently.</span>
+        <span class="bn-inline">বাউয়েট শিক্ষার্থীদের জন্য একটি কেন্দ্রীভূত ডিজিটাল প্ল্যাটফর্ম — সমস্যা জমা দিন, ট্র্যাক করুন এবং সরকারি তথ্য দ্রুততার সাথে পান।</span>
+      </p>
+      <div class="hero-actions">
+        <a href="auth.html?tab=register" class="btn btn-gold btn-lg">
+          <span class="en-inline">Get Started</span>
+          <span class="bn-inline">শুরু করুন</span>
+        </a>
+        <a href="#about" class="btn btn-outline btn-lg">
+          <span class="en-inline">Learn More</span>
+          <span class="bn-inline">আরও জানুন</span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card">
+        <div class="stat-num">4+</div>
+        <div class="stat-label">
+          <span class="en-inline">User Roles</span>
+          <span class="bn-inline">ব্যবহারকারীর ভূমিকা</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">7</div>
+        <div class="stat-label">
+          <span class="en-inline">Issue Categories</span>
+          <span class="bn-inline">সমস্যার বিভাগ</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">
+          <span class="en-inline">System Availability</span>
+          <span class="bn-inline">সিস্টেম সহলভ্যতা</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">
+          <span class="en-inline">Transparent Process</span>
+          <span class="bn-inline">স্বচ্ছ প্রক্রিয়া</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="gold-divider"></div>
+
+  <section class="about-strip" id="about">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div class="about-img-area reveal">
+          <div class="military-frame">
+            <div class="frame-inner">
+              <div class="bauet-seal">
+                <img src="assets/images/bauet-logo.png" alt="BAUET Official Crest"/>
+              </div>
+              <div class="frame-title">BAUET</div>
+              <div class="frame-sub en-inline">Est. 2015 · Qadirabad, Natore</div>
+              <div class="frame-sub bn-inline">প্রতিষ্ঠা ২০১৫ · কাদিরাবাদ, নাটোর</div>
+            </div>
+          </div>
+        </div>
+        <div class="about-text reveal">
+          <span class="section-tag en-inline">About BAUET &amp; This System</span>
+          <span class="section-tag bn-inline">বাউয়েট ও এই সিস্টেম সম্পর্কে</span>
+          <h2>
+            <span class="en-inline">An Army-Run<br/>Engineering University</span>
+            <span class="bn-inline">একটি শীর্ষস্থানীয়<br/>সেনাপরিচালিত প্রকৌশল বিশ্ববিদ্যালয়</span>
+          </h2>
+          <div class="about-body">
+            <span class="en-inline">Bangladesh Army University of Engineering &amp; Technology is a private engineering educational institution recognized by the University Grants Commission and operated by the Bangladesh Army. Located at Qadirabad Cantonment in Natore, BAUET has been providing quality higher education in engineering, technology and sciences since 2015.</span>
+            <span class="bn-inline">বাংলাদেশ আর্মি ইউনিভার্সিটি অব ইঞ্জিনিয়ারিং অ্যান্ড টেকনোলজি (বাউয়েট) বাংলাদেশ বিশ্ববিদ্যালয় মঞ্জুরি কমিশন কর্তৃক স্বীকৃত এবং বাংলাদেশ সেনাবাহিনী পরিচালিত একটি বেসরকারি প্রকৌশল শিক্ষা প্রতিষ্ঠান। নাটোরের কাদিরাবাদ সেনানিবাসে অবস্থিত বাউয়েট ২০১৫ সাল থেকে মানসম্পন্ন উচ্চশিক্ষা প্রদান করে আসছে।</span>
+            <br/><br/>
+            <span class="en-inline">This Help Desk System gives every student a direct, transparent channel to submit issues, track resolutions, and stay informed — replacing scattered notice boards and informal channels with one centralized platform.</span>
+            <span class="bn-inline">এই হেল্প ডেস্ক সিস্টেমটি প্রতিটি শিক্ষার্থীকে সমস্যা জমা দেওয়া, সমাধান ট্র্যাক করা এবং তথ্য পাওয়ার জন্য একটি সরাসরি ও স্বচ্ছ মাধ্যম দেওয়ার জন্য তৈরি করা হয়েছে।</span>
+          </div>
+          <div class="about-features">
+            <div class="feat-item">
+              <div class="feat-icon">🎯</div>
+              <div class="feat-label">
+                <span class="en-inline">Centralized Support</span>
+                <span class="bn-inline">কেন্দ্রীভূত সহায়তা</span>
+              </div>
+            </div>
+            <div class="feat-item">
+              <div class="feat-icon">⚡</div>
+              <div class="feat-label">
+                <span class="en-inline">Faster Resolution</span>
+                <span class="bn-inline">দ্রুত সমাধান</span>
+              </div>
+            </div>
+            <div class="feat-item">
+              <div class="feat-icon">🔍</div>
+              <div class="feat-label">
+                <span class="en-inline">Full Transparency</span>
+                <span class="bn-inline">সম্পূর্ণ স্বচ্ছতা</span>
+              </div>
+            </div>
+            <div class="feat-item">
+              <div class="feat-icon">📊</div>
+              <div class="feat-label">
+                <span class="en-inline">Detailed Reporting</span>
+                <span class="bn-inline">বিস্তারিত রিপোর্ট</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="modules-section" id="modules">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="section-tag">
+          <span class="en-inline">System Modules</span>
+          <span class="bn-inline">সিস্টেম মডিউল</span>
+        </span>
+        <h2>
+          <span class="en-inline">Four Powerful User Roles</span>
+          <span class="bn-inline">চারটি শক্তিশালী ব্যবহারকারীর ভূমিকা</span>
+        </h2>
+        <p class="section-desc">
+          <span class="en-inline">Each user type gets a tailored experience with the exact permissions they need.</span>
+          <span class="bn-inline">প্রতিটি ব্যবহারকারীর ধরন তাদের প্রয়োজনীয় অনুমতি সহ একটি কাস্টমাইজড অভিজ্ঞতা পায়।</span>
+        </p>
+      </div>
+      <div class="modules-grid reveal">
+        <div class="module-card">
+          <div class="module-num">01</div>
+          <div class="module-icon">🎓</div>
+          <div class="module-title">Student</div>
+          <div class="module-title-bn">শিক্ষার্থী</div>
+          <div class="module-desc">
+            <span class="en-inline">Submit tickets, track status, view notices and FAQs, and get timely updates on your issues.</span>
+            <span class="bn-inline">টিকেট জমা দিন, অবস্থা ট্র্যাক করুন, নোটিশ ও FAQ দেখুন এবং আপডেট পান।</span>
+          </div>
+          <div class="module-tag">Submit · Track · View</div>
+        </div>
+        <div class="module-card">
+          <div class="module-num">02</div>
+          <div class="module-icon">🛡️</div>
+          <div class="module-title">Help Desk Officer</div>
+          <div class="module-title-bn">হেল্প ডেস্ক অফিসার</div>
+          <div class="module-desc">
+            <span class="en-inline">View assigned tickets, reply to students, update status, and upload official documents.</span>
+            <span class="bn-inline">নির্ধারিত টিকেট দেখুন, শিক্ষার্থীদের উত্তর দিন, অবস্থা আপডেট করুন এবং নথি আপলোড করুন।</span>
+          </div>
+          <div class="module-tag">Respond · Resolve · Upload</div>
+        </div>
+        <div class="module-card">
+          <div class="module-num">03</div>
+          <div class="module-icon">🏛️</div>
+          <div class="module-title">Authority</div>
+          <div class="module-title-bn">কর্তৃপক্ষ</div>
+          <div class="module-desc">
+            <span class="en-inline">Monitor unresolved issues, view department-wise reports, and ensure accountability.</span>
+            <span class="bn-inline">অমীমাংসিত সমস্যা পর্যবেক্ষণ করুন, বিভাগভিত্তিক রিপোর্ট দেখুন এবং জবাবদিহিতা নিশ্চিত করুন।</span>
+          </div>
+          <div class="module-tag">Monitor · Reports · Oversee</div>
+        </div>
+        <div class="module-card">
+          <div class="module-num">04</div>
+          <div class="module-icon">⚙️</div>
+          <div class="module-title">Administrator</div>
+          <div class="module-title-bn">প্রশাসক</div>
+          <div class="module-desc">
+            <span class="en-inline">Full system control — manage users, roles, categories, and all system configurations.</span>
+            <span class="bn-inline">সম্পূর্ণ সিস্টেম নিয়ন্ত্রণ — ব্যবহারকারী, ভূমিকা, বিভাগ এবং সমস্ত কনফিগারেশন পরিচালনা করুন।</span>
+          </div>
+          <div class="module-tag">Full Access · Configure</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section" id="how">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="section-tag">
+          <span class="en-inline">Process Flow</span>
+          <span class="bn-inline">প্রক্রিয়ার ধারা</span>
+        </span>
+        <h2>
+          <span class="en-inline">How It Works</span>
+          <span class="bn-inline">কিভাবে কাজ করে</span>
+        </h2>
+      </div>
+      <div class="steps-container reveal">
+        <div class="step">
+          <div class="step-circle">1</div>
+          <div class="step-title">Register</div>
+          <div class="step-title-bn">নিবন্ধন করুন</div>
+          <div class="step-desc">
+            <span class="en-inline">Create your student account with your university credentials.</span>
+            <span class="bn-inline">আপনার বিশ্ববিদ্যালয়ের তথ্য দিয়ে অ্যাকাউন্ট তৈরি করুন।</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-circle">2</div>
+          <div class="step-title">Submit Issue</div>
+          <div class="step-title-bn">সমস্যা জমা দিন</div>
+          <div class="step-desc">
+            <span class="en-inline">Describe your problem and select the relevant category.</span>
+            <span class="bn-inline">আপনার সমস্যা বর্ণনা করুন এবং সংশ্লিষ্ট বিভাগ নির্বাচন করুন।</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-circle">3</div>
+          <div class="step-title">Get Assigned</div>
+          <div class="step-title-bn">নির্ধারিত হন</div>
+          <div class="step-desc">
+            <span class="en-inline">Your ticket is automatically assigned to the right officer.</span>
+            <span class="bn-inline">আপনার টিকেট স্বয়ংক্রিয়ভাবে সঠিক অফিসারের কাছে পাঠানো হয়।</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-circle">4</div>
+          <div class="step-title">Track &amp; Resolved</div>
+          <div class="step-title-bn">ট্র্যাক ও সমাধান</div>
+          <div class="step-desc">
+            <span class="en-inline">Receive updates and notifications until your issue is fully resolved.</span>
+            <span class="bn-inline">সমস্যা সম্পূর্ণ সমাধান না হওয়া পর্যন্ত আপডেট ও বিজ্ঞপ্তি পান।</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="categories-section" id="categories">
+    <div class="section-inner">
+      <div class="section-header reveal">
+        <span class="section-tag">
+          <span class="en-inline">Issue Categories</span>
+          <span class="bn-inline">সমস্যার বিভাগ</span>
+        </span>
+        <h2>
+          <span class="en-inline">What Can You Report?</span>
+          <span class="bn-inline">কী রিপোর্ট করতে পারবেন?</span>
+        </h2>
+      </div>
+      <div class="cat-grid reveal">
+        <div class="cat-chip">
+          <span class="cat-chip-icon">📚</span>
+          <div class="cat-chip-text">
+            <span class="en-inline">Academic</span>
+            <span class="bn-inline">একাডেমিক</span>
+          </div>
+        </div>
+        <div class="cat-chip">
+          <span class="cat-chip-icon">🏠</span>
+          <div class="cat-chip-text">
+            <span class="en-inline">Hostel</span>
+            <span class="bn-inline">হোস্টেল</span>
+          </div>
+        </div>
+        <div class="cat-chip">
+          <span class="cat-chip-icon">📋</span>
+          <div class="cat-chip-text">
+            <span class="en-inline">Registration</span>
+            <span class="bn-inline">নিবন্ধন</span>
+          </div>
+        </div>
+        <div class="cat-chip">
+          <span class="cat-chip-icon">📝</span>
+          <div class="cat-chip-text">
+            <span class="en-inline">Examination</span>
+            <span class="bn-inline">পরীক্ষা</span>
+          </div>
+        </div>
+        <div class="cat-chip">
+          <span class="cat-chip-icon">💻</span>
+          <div class="cat-chip-text">
+            <span class="en-inline">IT Support</span>
+            <span class="bn-inline">আইটি সহায়তা</span>
+          </div>
+        </div>
+        <div class="cat-chip">
+          <span class="cat-chip-icon">🏥</span>
+          <div class="cat-chip-text">
+            <span class="en-inline">Medical</span>
+            <span class="bn-inline">চিকিৎসা</span>
+          </div>
+        </div>
+        <div class="cat-chip">
+          <span class="cat-chip-icon">📎</span>
+          <div class="cat-chip-text">
+            <span class="en-inline">Others</span>
+            <span class="bn-inline">অন্যান্য</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="section-inner">
+      <h2>
+        <span class="en-inline">Ready to Get Help?</span>
+        <span class="bn-inline">সহায়তা নিতে প্রস্তুত?</span>
+      </h2>
+      <p>
+        <span class="en-inline">Join BAUET's official digital help desk. Register as a student and submit your first ticket today.</span>
+        <span class="bn-inline">বাউয়েটের অফিসিয়াল ডিজিটাল হেল্প ডেস্কে যোগ দিন। শিক্ষার্থী হিসেবে নিবন্ধন করুন এবং আজই আপনার প্রথম টিকেট জমা দিন।</span>
+      </p>
+      <div class="cta-buttons">
+        <a href="auth.html?tab=register" class="btn btn-gold btn-lg">
+          <span class="en-inline">Create Free Account</span>
+          <span class="bn-inline">বিনামূল্যে অ্যাকাউন্ট তৈরি করুন</span>
+        </a>
+        <a href="auth.html" class="btn btn-outline btn-lg">
+          <span class="en-inline">Sign In</span>
+          <span class="bn-inline">সাইন ইন করুন</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <div class="logo-emblem">
+            <img src="assets/images/bauet-logo.png" alt="BAUET Logo"/>
+          </div>
+          <div class="logo-text">
+            <div class="main">BAUET</div>
+            <div class="sub en-inline">Help Desk System</div>
+            <div class="sub bn-inline">হেল্প ডেস্ক সিস্টেম</div>
+          </div>
+        </div>
+        <p class="footer-about">
+          <span class="en-inline">A centralized student support system for Bangladesh Army University of Engineering &amp; Technology, Natore.</span>
+          <span class="bn-inline">বাংলাদেশ আর্মি ইউনিভার্সিটি অব ইঞ্জিনিয়ারিং অ্যান্ড টেকনোলজি, নাটোরের শিক্ষার্থীদের জন্য কেন্দ্রীভূত সহায়তা সিস্টেম।</span>
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>
+          <span class="en-inline">Navigation</span>
+          <span class="bn-inline">নেভিগেশন</span>
+        </h4>
+        <ul class="footer-links">
+          <li><a href="#about"><span class="en-inline">About</span><span class="bn-inline">পরিচিতি</span></a></li>
+          <li><a href="#modules"><span class="en-inline">Modules</span><span class="bn-inline">মডিউল</span></a></li>
+          <li><a href="#how"><span class="en-inline">How It Works</span><span class="bn-inline">কিভাবে কাজ করে</span></a></li>
+          <li><a href="#categories"><span class="en-inline">Categories</span><span class="bn-inline">বিভাগসমূহ</span></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>
+          <span class="en-inline">Access</span>
+          <span class="bn-inline">প্রবেশ</span>
+        </h4>
+        <ul class="footer-links">
+          <li><a href="auth.html"><span class="en-inline">Student Login</span><span class="bn-inline">শিক্ষার্থী লগইন</span></a></li>
+          <li><a href="auth.html?tab=register"><span class="en-inline">Register</span><span class="bn-inline">নিবন্ধন</span></a></li>
+          <li><a href="auth.html?role=officer"><span class="en-inline">Officer Login</span><span class="bn-inline">অফিসার লগইন</span></a></li>
+          <li><a href="auth.html?role=admin"><span class="en-inline">Admin Login</span><span class="bn-inline">অ্যাডমিন লগইন</span></a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        <span class="en-inline">&copy; 2025 BAUET Help Desk System. All rights reserved.</span>
+        <span class="bn-inline">&copy; ২০২৫ বাউয়েট হেল্প ডেস্ক সিস্টেম। সর্বস্বত্ব সংরক্ষিত।</span>
+      </div>
+      <div class="footer-gold-star">★ ★ ★</div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
