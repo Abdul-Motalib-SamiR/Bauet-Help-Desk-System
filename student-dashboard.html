@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAUET Help Desk | Student Dashboard</title>
+  <link rel="icon" type="image/png" href="assets/images/bauet-logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@300;400;600&family=Noto+Sans+Bengali:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/dashboard-base.css"/>
+</head>
+<body>
+
+<div class="toast" id="toast">
+  <div class="toast-title" id="toast-title"></div>
+  <div class="toast-msg"   id="toast-msg"></div>
+</div>
+
+<!-- Ticket Detail Modal -->
+<div class="modal-overlay" id="ticket-modal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-ticket-no">TKT-0001</div>
+        <div style="font-size:0.8rem;color:var(--cream-dim);margin-top:3px" id="modal-ticket-date"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px" id="modal-badges"></div>
+      <div style="font-family:'Cinzel',serif;font-size:1rem;color:var(--cream);margin-bottom:6px" id="modal-title"></div>
+      <div style="font-size:0.9rem;color:var(--cream-dim);line-height:1.7;padding:14px;background:rgba(27,50,16,0.3);border:1px solid var(--green-border);margin-bottom:24px" id="modal-desc"></div>
+      <div style="font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:2px;color:var(--gold-dim);margin-bottom:14px">— REPLY THREAD —</div>
+      <div class="thread-wrap" id="thread-wrap">
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+      </div>
+      <div style="margin-top:20px" id="reply-area">
+        <div class="field-group" style="margin-bottom:10px">
+          <label><span class="en-text">Your Reply</span><span class="bn-text">আপনার উত্তর</span></label>
+          <textarea id="reply-input" placeholder="Type your message..."></textarea>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="sendReply()">
+          <span class="en-text">Send Reply</span><span class="bn-text">উত্তর পাঠান</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dash-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-img"><img src="assets/images/bauet-logo.png" alt="BAUET"/></div>
+      <div class="sidebar-logo-text">
+        <div class="t1">BAUET</div>
+        <div class="t2"><span class="en-text">Help Desk</span><span class="bn-text">হেল্প ডেস্ক</span></div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label"><span class="en-text">Navigation</span><span class="bn-text">নেভিগেশন</span></div>
+      <button class="nav-item active" onclick="showSection('overview', this)">
+        <span class="nav-item-icon">🏠</span>
+        <span class="en-text">Overview</span><span class="bn-text">সারসংক্ষেপ</span>
+      </button>
+      <button class="nav-item" onclick="showSection('submit', this)">
+        <span class="nav-item-icon">➕</span>
+        <span class="en-text">Submit Ticket</span><span class="bn-text">টিকেট জমা দিন</span>
+      </button>
+      <button class="nav-item" onclick="showSection('tickets', this)">
+        <span class="nav-item-icon">🎫</span>
+        <span class="en-text">My Tickets</span><span class="bn-text">আমার টিকেট</span>
+        <span class="nav-badge" id="open-count" style="display:none">0</span>
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px"><span class="en-text">Information</span><span class="bn-text">তথ্য</span></div>
+      <button class="nav-item" onclick="showSection('notices', this)">
+        <span class="nav-item-icon">📢</span>
+        <span class="en-text">Notices</span><span class="bn-text">নোটিশ</span>
+      </button>
+      <button class="nav-item" onclick="showSection('profile', this)">
+        <span class="nav-item-icon">👤</span>
+        <span class="en-text">My Profile</span><span class="bn-text">আমার প্রোফাইল</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-info">
+          <div class="u-name" id="user-name">Loading...</div>
+          <div class="u-role"><span class="en-text">Student</span><span class="bn-text">শিক্ষার্থী</span></div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">
+        <span class="en-text">Sign Out</span><span class="bn-text">সাইন আউট</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <header class="top-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div>
+          <div class="page-title" id="header-title">Overview</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="lang-toggle">
+          <button class="lang-btn active" onclick="setLang('en')">EN</button>
+          <button class="lang-btn"        onclick="setLang('bn')">বাং</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="page-section active" id="section-overview">
+        <div class="section-heading">
+          <div>
+            <div class="section-title"><span class="en-text">Welcome back, </span><span class="bn-text">স্বাগতম, </span><span id="welcome-name">—</span></div>
+            <div class="section-subtitle"><span class="en-text">Here's a summary of your support activity</span><span class="bn-text">আপনার সাপোর্ট কার্যক্রমের সারসংক্ষেপ</span></div>
+          </div>
+          <button class="btn btn-gold" onclick="showSection('submit', document.querySelector('[onclick*=submit]'))">
+            + <span class="en-text">New Ticket</span><span class="bn-text">নতুন টিকেট</span>
+          </button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card stat-total">
+            <div class="stat-num" id="stat-total">—</div>
+            <div class="stat-label"><span class="en-text">Total Tickets</span><span class="bn-text">মোট টিকেট</span></div>
+          </div>
+          <div class="stat-card stat-open">
+            <div class="stat-num" id="stat-open">—</div>
+            <div class="stat-label"><span class="en-text">Open</span><span class="bn-text">খোলা</span></div>
+          </div>
+          <div class="stat-card stat-progress">
+            <div class="stat-num" id="stat-progress">—</div>
+            <div class="stat-label"><span class="en-text">In Progress</span><span class="bn-text">চলমান</span></div>
+          </div>
+          <div class="stat-card stat-resolved">
+            <div class="stat-num" id="stat-resolved">—</div>
+            <div class="stat-label"><span class="en-text">Resolved</span><span class="bn-text">সমাধান হয়েছে</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span class="en-text">Recent Tickets</span><span class="bn-text">সাম্প্রতিক টিকেট</span></div>
+            <button class="btn btn-outline btn-sm" onclick="showSection('tickets', document.querySelector('[onclick*=tickets]'))">
+              <span class="en-text">View All</span><span class="bn-text">সব দেখুন</span>
+            </button>
+          </div>
+          <div id="recent-tickets-body">
+            <div class="spinner-wrap"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SUBMIT TICKET ═══ -->
+      <div class="page-section" id="section-submit">
+        <div class="section-heading">
+          <div>
+            <div class="section-title"><span class="en-text">Submit New Ticket</span><span class="bn-text">নতুন টিকেট জমা দিন</span></div>
+            <div class="section-subtitle"><span class="en-text">Describe your issue clearly for faster resolution</span><span class="bn-text">দ্রুত সমাধানের জন্য আপনার সমস্যা স্পষ্টভাবে বর্ণনা করুন</span></div>
+          </div>
+        </div>
+
+        <div class="card" style="max-width:680px">
+          <div class="card-body">
+            <form id="submit-form" onsubmit="handleSubmitTicket(event)">
+              <div class="form-grid" style="gap:20px">
+                <div class="field-group">
+                  <label><span class="en-text">Issue Title</span><span class="bn-text">সমস্যার শিরোনাম</span></label>
+                  <input type="text" id="t-title" placeholder="Brief summary of your issue" required maxlength="120"/>
+                </div>
+                <div class="form-grid form-grid-2">
+                  <div class="field-group">
+                    <label><span class="en-text">Category</span><span class="bn-text">বিভাগ</span></label>
+                    <select id="t-category" required>
+                      <option value="">— Select —</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label><span class="en-text">Priority</span><span class="bn-text">অগ্রাধিকার</span></label>
+                    <select id="t-priority">
+                      <option value="low">Low</option>
+                      <option value="normal" selected>Normal</option>
+                      <option value="high">High</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label><span class="en-text">Description</span><span class="bn-text">বিবরণ</span></label>
+                  <textarea id="t-desc" placeholder="Explain your issue in detail — what happened, when it happened, and what you need..." required style="min-height:130px"></textarea>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap">
+                  <button type="submit" class="btn btn-gold" id="submit-btn">
+                    <span class="en-text">Submit Ticket</span><span class="bn-text">টিকেট জমা দিন</span>
+                  </button>
+                  <button type="button" class="btn btn-outline" onclick="document.getElementById('submit-form').reset()">
+                    <span class="en-text">Clear</span><span class="bn-text">মুছুন</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ MY TICKETS ═══ -->
+      <div class="page-section" id="section-tickets">
+        <div class="section-heading">
+          <div>
+            <div class="section-title"><span class="en-text">My Tickets</span><span class="bn-text">আমার টিকেট</span></div>
+            <div class="section-subtitle"><span class="en-text">Track all your submitted issues</span><span class="bn-text">আপনার সমস্ত জমা দেওয়া সমস্যা ট্র্যাক করুন</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="toolbar">
+              <button class="toolbar-filter active" onclick="filterTickets('all', this)"><span class="en-text">All</span><span class="bn-text">সব</span></button>
+              <button class="toolbar-filter" onclick="filterTickets('open', this)"><span class="en-text">Open</span><span class="bn-text">খোলা</span></button>
+              <button class="toolbar-filter" onclick="filterTickets('in_progress', this)"><span class="en-text">In Progress</span><span class="bn-text">চলমান</span></button>
+              <button class="toolbar-filter" onclick="filterTickets('resolved', this)"><span class="en-text">Resolved</span><span class="bn-text">সমাধান হয়েছে</span></button>
+            </div>
+          </div>
+          <div id="tickets-body">
+            <div class="spinner-wrap"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ NOTICES ═══ -->
+      <div class="page-section" id="section-notices">
+        <div class="section-heading">
+          <div>
+            <div class="section-title"><span class="en-text">Official Notices</span><span class="bn-text">অফিসিয়াল নোটিশ</span></div>
+            <div class="section-subtitle"><span class="en-text">Announcements and updates from BAUET</span><span class="bn-text">বাউয়েটের ঘোষণা ও আপডেট</span></div>
+          </div>
+        </div>
+        <div id="notices-body">
+          <div class="spinner-wrap"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ PROFILE ═══ -->
+      <div class="page-section" id="section-profile">
+        <div class="section-heading">
+          <div>
+            <div class="section-title"><span class="en-text">My Profile</span><span class="bn-text">আমার প্রোফাইল</span></div>
+            <div class="section-subtitle"><span class="en-text">Your account information</span><span class="bn-text">আপনার অ্যাকাউন্ট তথ্য</span></div>
+          </div>
+        </div>
+        <div class="card" style="max-width:540px" id="profile-card">
+          <div class="spinner-wrap"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /dash-layout -->
+
+<script src="js/utils.js"></script>
+<script src="js/student.js"></script>
+</body>
+</html>
