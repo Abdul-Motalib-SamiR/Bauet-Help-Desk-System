@@ -7,8 +7,6 @@
   --gold-light:   #E8C96A;
   --gold-pale:    #F5E6A3;
   --cream:        #F7F0DC;
-  --cream-dark:   #EDE3C4;
-  --white:        #FEFCF5;
   --error:        #E05555;
   --success:      #4CAF7C;
   --warning:      #E8A020;
@@ -222,8 +220,7 @@ body {
 .tab-btn {
   flex: 1;
   padding: 14px 20px;
-  background: none;
-  border: none;
+  background: none; border: none;
   font-family: 'Cinzel', serif;
   font-size: 0.75rem; letter-spacing: 2px;
   text-transform: uppercase;
@@ -263,12 +260,7 @@ body {
 }
 
 /* ─── FIELDS ─── */
-.field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .field-group { margin-bottom: 20px; }
 
 label {
@@ -300,7 +292,7 @@ input:focus, select:focus {
   background: rgba(27, 50, 16, 0.6);
 }
 
-input.error, select.error { border-color: var(--error); }
+input.error { border-color: var(--error); }
 select option { background: var(--green-dark); }
 
 .field-hint {
@@ -335,12 +327,12 @@ select option { background: var(--green-dark); }
 
 /* ─── ROLE SELECTOR ─── */
 .role-selector-label {
+  display: block;
   font-family: 'Cinzel', serif;
   font-size: 0.62rem; letter-spacing: 2px;
   text-transform: uppercase;
   color: rgba(200, 168, 75, 0.7);
   margin-bottom: 8px;
-  display: block;
 }
 
 .role-selector {
@@ -357,8 +349,7 @@ select option { background: var(--green-dark); }
   padding: 12px 14px;
   border: 1px solid rgba(200, 168, 75, 0.15);
   background: rgba(27, 50, 16, 0.3);
-  cursor: pointer;
-  border-radius: 2px;
+  cursor: pointer; border-radius: 2px;
   transition: all 0.2s;
   position: relative;
 }
@@ -385,13 +376,13 @@ select option { background: var(--green-dark); }
   font-size: 0.65rem;
   color: rgba(200, 168, 75, 0.5);
   margin-top: 1px;
+  display: block;
 }
 
 .role-restricted-badge {
   position: absolute;
   top: 5px; right: 6px;
-  font-size: 0.5rem;
-  letter-spacing: 1px;
+  font-size: 0.5rem; letter-spacing: 1px;
   background: rgba(232, 160, 32, 0.15);
   border: 1px solid rgba(232, 160, 32, 0.4);
   color: var(--warning);
@@ -470,124 +461,6 @@ select option { background: var(--green-dark); }
 
 .switch-link:hover { color: var(--gold-light); }
 
-/* ─── OTP STEP ─── */
-.otp-step {
-  display: none;
-  animation: fadeIn 0.35s ease;
-}
-
-.otp-step.active { display: block; }
-
-.otp-header { margin-bottom: 28px; }
-
-.otp-title {
-  font-family: 'Cinzel', serif;
-  font-size: 1.5rem; font-weight: 600;
-  color: var(--cream);
-  margin-bottom: 10px;
-}
-
-.otp-subtitle {
-  font-size: 0.92rem;
-  color: rgba(247, 240, 220, 0.55);
-  line-height: 1.6;
-}
-
-.otp-email-display {
-  display: inline-block;
-  color: var(--gold);
-  font-weight: 600;
-}
-
-.otp-boxes {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin: 32px 0 24px;
-}
-
-.otp-box {
-  width: 52px; height: 62px;
-  background: rgba(27, 50, 16, 0.5);
-  border: 1px solid rgba(200, 168, 75, 0.25);
-  border-radius: 4px;
-  text-align: center;
-  font-family: 'Cinzel', serif;
-  font-size: 1.6rem; font-weight: 700;
-  color: var(--gold);
-  outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  caret-color: var(--gold);
-}
-
-.otp-box:focus {
-  border-color: var(--gold);
-  background: rgba(27, 50, 16, 0.8);
-  box-shadow: 0 0 0 3px rgba(200, 168, 75, 0.1);
-}
-
-.otp-box.filled {
-  border-color: rgba(200, 168, 75, 0.6);
-  background: rgba(27, 50, 16, 0.7);
-}
-
-.otp-box.error-box { border-color: var(--error); }
-
-.otp-timer {
-  text-align: center;
-  font-size: 0.82rem;
-  color: rgba(247, 240, 220, 0.4);
-  margin-bottom: 8px;
-}
-
-.otp-timer .timer-count {
-  color: var(--gold);
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-}
-
-.otp-timer .timer-expired {
-  display: none;
-  color: var(--error);
-}
-
-.otp-resend {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.resend-btn {
-  background: none; border: none;
-  color: var(--gold);
-  font-family: 'Cinzel', serif;
-  font-size: 0.65rem; letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  opacity: 0.5;
-  transition: opacity 0.2s;
-}
-
-.resend-btn:not(:disabled) { opacity: 1; }
-.resend-btn:disabled { cursor: not-allowed; }
-
-.otp-back-btn {
-  background: none; border: none;
-  color: rgba(247, 240, 220, 0.4);
-  font-family: 'Cinzel', serif;
-  font-size: 0.62rem; letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  text-decoration: underline;
-  margin-top: 14px;
-  display: block;
-  text-align: center;
-  transition: color 0.2s;
-}
-
-.otp-back-btn:hover { color: rgba(247, 240, 220, 0.7); }
-
 /* ─── ROLE REQUEST PENDING SCREEN ─── */
 .pending-screen {
   display: none;
@@ -612,7 +485,7 @@ select option { background: var(--green-dark); }
   color: rgba(247, 240, 220, 0.6);
   line-height: 1.7;
   max-width: 360px;
-  margin: 0 auto 28px;
+  margin: 0 auto 24px;
 }
 
 .pending-role-badge {
@@ -625,7 +498,7 @@ select option { background: var(--green-dark); }
   font-size: 0.7rem; letter-spacing: 2px;
   text-transform: uppercase;
   border-radius: 2px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .pending-info {
@@ -675,7 +548,7 @@ select option { background: var(--green-dark); }
 }
 
 .toast.show { transform: translateX(0); }
-.toast.error-toast { border-left-color: var(--error); }
+.toast.error-toast   { border-left-color: var(--error); }
 .toast.success-toast { border-left-color: var(--success); }
 .toast.warning-toast { border-left-color: var(--warning); }
 
@@ -715,7 +588,8 @@ select option { background: var(--green-dark); }
   font-size: 1rem;
   color: rgba(247, 240, 220, 0.6);
   margin-bottom: 32px;
-  max-width: 400px;
+  max-width: 420px;
+  line-height: 1.7;
 }
 
 .success-btn {
@@ -740,5 +614,4 @@ select option { background: var(--green-dark); }
   .auth-layout { grid-template-columns: 1fr; }
   .panel-left { display: none; }
   .panel-right { padding: 40px 24px; justify-content: flex-start; padding-top: 80px; }
-  .otp-box { width: 44px; height: 54px; font-size: 1.4rem; }
 }
