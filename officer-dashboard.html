@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAUET Help Desk | Officer Dashboard</title>
+  <link rel="icon" type="image/png" href="assets/images/bauet-logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@300;400;600&family=Noto+Sans+Bengali:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/dashboard-base.css"/>
+</head>
+<body>
+
+<div class="toast" id="toast"><div class="toast-title" id="toast-title"></div><div class="toast-msg" id="toast-msg"></div></div>
+
+<!-- Ticket Work Modal -->
+<div class="modal-overlay" id="ticket-modal">
+  <div class="modal" style="max-width:740px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-ticket-no"></div>
+        <div style="font-size:0.78rem;color:var(--cream-dim);margin-top:3px" id="modal-student-name"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px" id="modal-badges"></div>
+      <div style="font-family:'Cinzel',serif;font-size:1rem;color:var(--cream);margin-bottom:8px" id="modal-title"></div>
+      <div style="font-size:0.9rem;color:var(--cream-dim);line-height:1.7;padding:14px;background:rgba(27,50,16,0.3);border:1px solid var(--green-border);margin-bottom:20px" id="modal-desc"></div>
+
+      <!-- Status Update -->
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px;background:var(--gold-faint);border:1px solid rgba(200,168,75,0.15);margin-bottom:20px">
+        <span style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:2px;color:var(--gold-dim)">UPDATE STATUS:</span>
+        <select id="status-select" style="padding:6px 12px;background:var(--green-dark);border:1px solid var(--green-border);color:var(--cream);font-family:'Cinzel',serif;font-size:0.68rem;border-radius:2px;outline:none">
+          <option value="open">Open</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="closed">Closed</option>
+        </select>
+        <button class="btn btn-gold btn-sm" onclick="updateTicketStatus()">
+          <span class="en-text">Update</span><span class="bn-text">আপডেট</span>
+        </button>
+        <button class="btn btn-outline btn-sm" id="assign-btn" onclick="assignToMe()">
+          <span class="en-text">Assign to Me</span><span class="bn-text">আমাকে নির্ধারণ করুন</span>
+        </button>
+      </div>
+
+      <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:2px;color:var(--gold-dim);margin-bottom:12px">— REPLY THREAD —</div>
+      <div class="thread-wrap" id="thread-wrap">
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="field-group" style="margin-bottom:10px">
+          <label><span class="en-text">Reply to Student</span><span class="bn-text">শিক্ষার্থীকে উত্তর দিন</span></label>
+          <textarea id="reply-input" placeholder="Write your official response..."></textarea>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="sendReply()">
+          <span class="en-text">Send Reply</span><span class="bn-text">উত্তর পাঠান</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dash-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-img"><img src="assets/images/bauet-logo.png" alt="BAUET"/></div>
+      <div class="sidebar-logo-text">
+        <div class="t1">BAUET</div>
+        <div class="t2"><span class="en-text">Officer Panel</span><span class="bn-text">অফিসার প্যানেল</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label"><span class="en-text">Tickets</span><span class="bn-text">টিকেট</span></div>
+      <button class="nav-item active" onclick="showSection('overview', this)">
+        <span class="nav-item-icon">🏠</span>
+        <span class="en-text">Overview</span><span class="bn-text">সারসংক্ষেপ</span>
+      </button>
+      <button class="nav-item" onclick="showSection('queue', this)">
+        <span class="nav-item-icon">📋</span>
+        <span class="en-text">Ticket Queue</span><span class="bn-text">টিকেট কিউ</span>
+        <span class="nav-badge" id="queue-count" style="display:none">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('mine', this)">
+        <span class="nav-item-icon">🎯</span>
+        <span class="en-text">Assigned to Me</span><span class="bn-text">আমার নির্ধারিত</span>
+      </button>
+      <div class="nav-section-label" style="margin-top:8px"><span class="en-text">Actions</span><span class="bn-text">কার্যক্রম</span></div>
+      <button class="nav-item" onclick="showSection('notice', this)">
+        <span class="nav-item-icon">📢</span>
+        <span class="en-text">Post Notice</span><span class="bn-text">নোটিশ পোস্ট করুন</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-info">
+          <div class="u-name" id="user-name">Loading...</div>
+          <div class="u-role"><span class="en-text">Officer</span><span class="bn-text">অফিসার</span></div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()"><span class="en-text">Sign Out</span><span class="bn-text">সাইন আউট</span></button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <header class="top-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="page-title" id="header-title">Overview</div>
+      </div>
+      <div class="header-right">
+        <div class="lang-toggle">
+          <button class="lang-btn active" onclick="setLang('en')">EN</button>
+          <button class="lang-btn"        onclick="setLang('bn')">বাং</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="page-section active" id="section-overview">
+        <div class="section-heading">
+          <div>
+            <div class="section-title" id="officer-welcome">Officer Dashboard</div>
+            <div class="section-subtitle"><span class="en-text">Ticket management and response centre</span><span class="bn-text">টিকেট ব্যবস্থাপনা ও প্রতিক্রিয়া কেন্দ্র</span></div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card stat-open"><div class="stat-num" id="stat-open">—</div><div class="stat-label"><span class="en-text">Open Tickets</span><span class="bn-text">খোলা টিকেট</span></div></div>
+          <div class="stat-card stat-progress"><div class="stat-num" id="stat-progress">—</div><div class="stat-label"><span class="en-text">In Progress</span><span class="bn-text">চলমান</span></div></div>
+          <div class="stat-card stat-resolved"><div class="stat-num" id="stat-resolved">—</div><div class="stat-label"><span class="en-text">Resolved</span><span class="bn-text">সমাধান হয়েছে</span></div></div>
+          <div class="stat-card stat-total"><div class="stat-num" id="stat-mine">—</div><div class="stat-label"><span class="en-text">Assigned to Me</span><span class="bn-text">আমার নির্ধারিত</span></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span class="en-text">Pending Tickets — Needs Attention</span><span class="bn-text">মুলতুবি টিকেট — মনোযোগ প্রয়োজন</span></div>
+          </div>
+          <div id="overview-tickets-body"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ TICKET QUEUE ═══ -->
+      <div class="page-section" id="section-queue">
+        <div class="section-heading">
+          <div>
+            <div class="section-title"><span class="en-text">Ticket Queue</span><span class="bn-text">টিকেট কিউ</span></div>
+            <div class="section-subtitle"><span class="en-text">All open and in-progress tickets</span><span class="bn-text">সমস্ত খোলা ও চলমান টিকেট</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="toolbar">
+              <button class="toolbar-filter active" onclick="filterQueue('all', this)"><span class="en-text">All</span><span class="bn-text">সব</span></button>
+              <button class="toolbar-filter" onclick="filterQueue('open', this)"><span class="en-text">Open</span><span class="bn-text">খোলা</span></button>
+              <button class="toolbar-filter" onclick="filterQueue('in_progress', this)"><span class="en-text">In Progress</span><span class="bn-text">চলমান</span></button>
+              <button class="toolbar-filter" onclick="filterQueue('high', this)"><span class="en-text">High Priority</span><span class="bn-text">উচ্চ অগ্রাধিকার</span></button>
+              <button class="toolbar-filter" onclick="filterQueue('urgent', this)"><span class="en-text">Urgent</span><span class="bn-text">জরুরি</span></button>
+            </div>
+          </div>
+          <div id="queue-body"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ ASSIGNED TO ME ═══ -->
+      <div class="page-section" id="section-mine">
+        <div class="section-heading">
+          <div>
+            <div class="section-title"><span class="en-text">Assigned to Me</span><span class="bn-text">আমার নির্ধারিত</span></div>
+            <div class="section-subtitle"><span class="en-text">Tickets you are responsible for</span><span class="bn-text">আপনি যে টিকেটগুলির জন্য দায়িত্বশীল</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div id="mine-body"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ POST NOTICE ═══ -->
+      <div class="page-section" id="section-notice">
+        <div class="section-heading">
+          <div>
+            <div class="section-title"><span class="en-text">Post Official Notice</span><span class="bn-text">অফিসিয়াল নোটিশ পোস্ট করুন</span></div>
+            <div class="section-subtitle"><span class="en-text">Publish announcements visible to all students</span><span class="bn-text">সকল শিক্ষার্থীদের কাছে দৃশ্যমান ঘোষণা প্রকাশ করুন</span></div>
+          </div>
+        </div>
+        <div class="card" style="max-width:680px">
+          <div class="card-body">
+            <form id="notice-form" onsubmit="handlePostNotice(event)">
+              <div class="form-grid" style="gap:20px">
+                <div class="field-group">
+                  <label><span class="en-text">Notice Title (English)</span><span class="bn-text">নোটিশ শিরোনাম (ইংরেজি)</span></label>
+                  <input type="text" id="n-title-en" placeholder="Official title of the notice" required/>
+                </div>
+                <div class="field-group">
+                  <label><span class="en-text">Notice Title (Bengali — optional)</span><span class="bn-text">নোটিশ শিরোনাম (বাংলা — ঐচ্ছিক)</span></label>
+                  <input type="text" id="n-title-bn" placeholder="বাংলায় শিরোনাম (ঐচ্ছিক)"/>
+                </div>
+                <div class="field-group">
+                  <label><span class="en-text">Body (English)</span><span class="bn-text">বিষয়বস্তু (ইংরেজি)</span></label>
+                  <textarea id="n-body-en" placeholder="Full content of the notice..." required style="min-height:120px"></textarea>
+                </div>
+                <div class="field-group">
+                  <label><span class="en-text">Body (Bengali — optional)</span><span class="bn-text">বিষয়বস্তু (বাংলা — ঐচ্ছিক)</span></label>
+                  <textarea id="n-body-bn" placeholder="বাংলায় বিষয়বস্তু (ঐচ্ছিক)" style="min-height:80px"></textarea>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:1px;color:var(--gold-dim)">
+                    <input type="checkbox" id="n-pinned" style="width:auto;cursor:pointer"/>
+                    <span class="en-text">Pin this notice (show at top)</span><span class="bn-text">এই নোটিশটি পিন করুন</span>
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-gold" id="notice-btn">
+                  <span class="en-text">Publish Notice</span><span class="bn-text">নোটিশ প্রকাশ করুন</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/officer.js"></script>
+</body>
+</html>
