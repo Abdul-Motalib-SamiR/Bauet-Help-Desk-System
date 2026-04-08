@@ -134,28 +134,6 @@ CREATE TABLE IF NOT EXISTS public.faqs (
 
 
 -- ============================================================
--- AUTO-ADMIN TRIGGER
--- When mdmottalib515@gmail.com signs up, force role = 'admin'
--- and set the pre-known student_id in their profile.
--- ============================================================
-CREATE OR REPLACE FUNCTION assign_admin_if_known()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.email = 'mdmottalib515@gmail.com' THEN
-    NEW.role       := 'admin';
-    NEW.student_id := '0812320205101007';
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER auto_assign_admin
-  BEFORE INSERT ON public.profiles
-  FOR EACH ROW
-  EXECUTE FUNCTION assign_admin_if_known();
-
-
--- ============================================================
 -- ROW LEVEL SECURITY
 -- ============================================================
 

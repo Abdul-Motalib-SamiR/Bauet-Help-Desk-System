@@ -215,7 +215,7 @@ async function handleRegister(e) {
                     role:       registrationRole
                 },
                 // After email confirmation, redirect back to auth page
-                emailRedirectTo: window.location.origin + '/auth.html'
+                emailRedirectTo: 'https://bauet-help-desk-system.vercel.app/auth.html'
             }
         });
 
@@ -223,26 +223,19 @@ async function handleRegister(e) {
 
         var userId = result.data.user ? result.data.user.id : null;
 
-        // Save profile immediately (works even before email confirmation)
-        if (userId) {
-            await sb.from('profiles').upsert({
-                id:         userId,
-                full_name:  fullName,
-                email:      email,
-                student_id: studentId,
-                role:       registrationRole,
-                created_at: new Date().toISOString()
-            });
+        // Profile is created automatically by the database trigger on_auth_user_created
+        // (SECURITY DEFINER trigger on auth.users — bypasses RLS correctly)
 
-            // If restricted role requested, file a role upgrade request
-            if (isRestricted) {
-                await sb.from('role_requests').insert({
-                    user_id:        userId,
-                    requested_role: roleChoice,
-                    status:         'pending',
-                    note:           'Self-registered, requested role: ' + roleChoice
-                });
-            }
+        // If restricted role requested, file a role upgrade request
+        // We do this after a short delay to allow the trigger to create the profile first
+        if (isRestricted && userId) {
+            await new Promise(function(resolve) { setTimeout(resolve, 1500); });
+            await sb.from('role_requests').insert({
+                user_id:        userId,
+                requested_role: roleChoice,
+                status:         'pending',
+                note:           'Self-registered, requested role: ' + roleChoice
+            });
         }
 
         if (isRestricted) {
@@ -275,31 +268,100 @@ async function handleRegister(e) {
 
 // ─────────────────────────────────────────────
 // HANDLE EMAIL CONFIRMATION REDIRECT
+// When Supabase redirects back after confirmation
+// link click, auto sign-in and go to dashboard
 // ─────────────────────────────────────────────
 async function handleAuthCallback() {
     var hash = window.location.hash;
     if (!hash || !hash.includes('access_token')) return;
 
-    // Supabase JS v2 handles the session from URL automatically
-    var sessionResult = await sb.auth.getSession();
-    if (sessionResult.data && sessionResult.data.session) {
-        var user = sessionResult.data.session.user;
+    // Show a brief loading state
+    document.getElementById('auth-tabs').style.display = 'none';
+    document.querySelectorAll('.form-panel').forEach(function(p) { p.classList.remove('active'); });
 
-        // Ensure profile exists (in case upsert was missed)
-        var profileResult = await sb.from('profiles').select('role, full_name').eq('id', user.id).single();
+    var loadingDiv = document.createElement('div');
+    loadingDiv.style.cssText = 'text-align:center;padding:60px 20px';
+    loadingDiv.innerHTML = '<div style="font-family:Cinzel,serif;font-size:0.9rem;color:var(--gold);letter-spacing:2px;margin-bottom:16px">VERIFYING EMAIL...</div>' +
+        '<div style="width:32px;height:32px;border:2px solid rgba(200,168,75,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div>';
+    document.querySelector('.form-wrapper').appendChild(loadingDiv);
 
-        if (!profileResult.error && profileResult.data) {
+    try {
+        // Supabase JS v2 automatically parses the token from the URL hash
+        var sessionResult = await sb.auth.getSession();
+
+        if (!sessionResult.data || !sessionResult.data.session) {
+            // Token may have expired — ask them to log in manually
+            loadingDiv.remove();
+            document.getElementById('auth-tabs').style.display = 'flex';
+            document.getElementById('panel-login').classList.add('active');
+            history.replaceState(null, '', window.location.pathname);
+            showToast(
+                currentLang === 'bn' ? 'লিংক মেয়াদোত্তীর্ণ' : 'Link Expired',
+                currentLang === 'bn'
+                    ? 'কনফার্মেশন লিংকটি মেয়াদোত্তীর্ণ। অনুগ্রহ করে সাইন ইন করুন।'
+                    : 'The confirmation link has expired. Please sign in manually.',
+                'warning'
+            );
+            return;
+        }
+
+        var user    = sessionResult.data.session.user;
+        var urlParams = new URLSearchParams(hash.substring(1));
+        var type    = urlParams.get('type'); // 'signup' or 'recovery'
+
+        // Load their profile to get role
+        var profileResult = await sb.from('profiles')
+            .select('role, full_name, is_active')
+            .eq('id', user.id)
+            .single();
+
+        // Clean the ugly token hash from the URL immediately
+        history.replaceState(null, '', window.location.pathname);
+
+        if (profileResult.error || !profileResult.data) {
+            // Profile missing — show sign-in form with success toast
+            loadingDiv.remove();
+            document.getElementById('auth-tabs').style.display = 'flex';
+            document.getElementById('panel-login').classList.add('active');
             showToast(
                 currentLang === 'bn' ? 'ইমেইল যাচাই সম্পন্ন!' : 'Email Confirmed!',
                 currentLang === 'bn'
-                    ? 'আপনার অ্যাকাউন্ট সক্রিয় হয়েছে। এখন সাইন ইন করুন।'
-                    : 'Your account is active. Please sign in to continue.',
+                    ? 'অ্যাকাউন্ট সক্রিয়। সাইন ইন করুন।'
+                    : 'Account activated. Please sign in to continue.',
                 'success'
             );
+            return;
         }
 
-        // Clean the URL
+        var profile = profileResult.data;
+        var dashboardMap = {
+            student:   'student-dashboard.html',
+            officer:   'officer-dashboard.html',
+            authority: 'authority-dashboard.html',
+            admin:     'admin-panel.html'
+        };
+
+        // Auto-redirect to their dashboard — no need to sign in again
+        showSuccess(
+            currentLang === 'bn' ? 'ইমেইল যাচাই সম্পন্ন!' : '✅ Email Verified!',
+            currentLang === 'bn'
+                ? 'স্বাগতম, ' + profile.full_name + '! আপনার অ্যাকাউন্ট সক্রিয় হয়েছে। ড্যাশবোর্ডে নিয়ে যাওয়া হচ্ছে...'
+                : 'Welcome, ' + profile.full_name + '! Your account is now active. Taking you to your dashboard...',
+            currentLang === 'bn' ? 'ড্যাশবোর্ডে যান' : 'Go to Dashboard',
+            dashboardMap[profile.role] || 'student-dashboard.html'
+        );
+
+        // Auto-redirect after 2.5 seconds without waiting for button click
+        setTimeout(function() {
+            window.location.href = dashboardMap[profile.role] || 'student-dashboard.html';
+        }, 2500);
+
+    } catch (err) {
+        loadingDiv.remove();
+        document.getElementById('auth-tabs').style.display = 'flex';
+        document.getElementById('panel-login').classList.add('active');
         history.replaceState(null, '', window.location.pathname);
+        showToast('Error', err.message || 'Verification failed. Please try signing in.', 'error');
     }
 }
 
