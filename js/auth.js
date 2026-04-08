@@ -223,26 +223,19 @@ async function handleRegister(e) {
 
         var userId = result.data.user ? result.data.user.id : null;
 
-        // Save profile immediately (works even before email confirmation)
-        if (userId) {
-            await sb.from('profiles').upsert({
-                id:         userId,
-                full_name:  fullName,
-                email:      email,
-                student_id: studentId,
-                role:       registrationRole,
-                created_at: new Date().toISOString()
-            });
+        // Profile is created automatically by the database trigger on_auth_user_created
+        // (SECURITY DEFINER trigger on auth.users — bypasses RLS correctly)
 
-            // If restricted role requested, file a role upgrade request
-            if (isRestricted) {
-                await sb.from('role_requests').insert({
-                    user_id:        userId,
-                    requested_role: roleChoice,
-                    status:         'pending',
-                    note:           'Self-registered, requested role: ' + roleChoice
-                });
-            }
+        // If restricted role requested, file a role upgrade request
+        // We do this after a short delay to allow the trigger to create the profile first
+        if (isRestricted && userId) {
+            await new Promise(function(resolve) { setTimeout(resolve, 1500); });
+            await sb.from('role_requests').insert({
+                user_id:        userId,
+                requested_role: roleChoice,
+                status:         'pending',
+                note:           'Self-registered, requested role: ' + roleChoice
+            });
         }
 
         if (isRestricted) {
