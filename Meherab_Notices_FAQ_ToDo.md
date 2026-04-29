@@ -1,6 +1,6 @@
-# Member 2 — Public Notices & FAQ Page
+# Meherab — Public Notices & FAQ Page - ToDo
 
-**Branch:** `Meherab_ID_07`  
+**Branch:** `Meherab_ID_23`  
 **Files to create:** `notices.html` · `css/notices.css` · `js/notices.js`
 
 ---
