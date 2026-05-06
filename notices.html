@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAUET Help Desk | Notices & FAQs</title>
+  <link rel="icon" type="image/png" href="assets/images/bauet-logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+Bengali:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/notices.css"/>
+</head>
+<body>
+
+  <!-- Language bar -->
+  <div class="lang-bar">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn"        id="btn-bn" onclick="setLang('bn')">বাং</button>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="nav-logo">
+      <div class="logo-emblem">
+        <img src="assets/images/bauet-logo.png" alt="BAUET"/>
+      </div>
+      <div class="logo-text">
+        <div class="logo-name">BAUET</div>
+        <div class="logo-sub">
+          <span class="en-inline">Help Desk</span>
+          <span class="bn-inline">হেল্প ডেস্ক</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-links">
+      <a href="index.html">
+        <span class="en-inline">Home</span>
+        <span class="bn-inline">হোম</span>
+      </a>
+      <a href="notices.html" class="nav-active">
+        <span class="en-inline">Notices</span>
+        <span class="bn-inline">নোটিশ</span>
+      </a>
+      <a href="notices.html#faqs">
+        <span class="en-inline">FAQs</span>
+        <span class="bn-inline">প্রশ্নোত্তর</span>
+      </a>
+    </div>
+
+    <div class="nav-cta">
+      <a href="auth.html" class="btn btn-outline-gold">
+        <span class="en-inline">Login</span>
+        <span class="bn-inline">লগইন</span>
+      </a>
+      <a href="auth.html?tab=register" class="btn btn-gold">
+        <span class="en-inline">Register</span>
+        <span class="bn-inline">নিবন্ধন</span>
+      </a>
+    </div>
+
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile drawer -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html" onclick="closeMobileMenu()">
+      <span class="en-inline">Home</span><span class="bn-inline">হোম</span>
+    </a>
+    <a href="notices.html" onclick="closeMobileMenu()">
+      <span class="en-inline">Notices</span><span class="bn-inline">নোটিশ</span>
+    </a>
+    <a href="notices.html#faqs" onclick="closeMobileMenu()">
+      <span class="en-inline">FAQs</span><span class="bn-inline">প্রশ্নোত্তর</span>
+    </a>
+    <a href="auth.html" onclick="closeMobileMenu()">
+      <span class="en-inline">Login</span><span class="bn-inline">লগইন</span>
+    </a>
+  </div>
+
+  <!-- Hero banner -->
+  <section class="hero-banner">
+    <div class="hero-banner-inner">
+      <div class="hero-eyebrow">
+        <span class="en-inline">Bangladesh Army University of Engineering &amp; Technology</span>
+        <span class="bn-inline">বাংলাদেশ আর্মি ইউনিভার্সিটি অব ইঞ্জিনিয়ারিং অ্যান্ড টেকনোলজি</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="en-inline">Official Notices &amp; Announcements</span>
+        <span class="bn-inline">অফিসিয়াল নোটিশ ও ঘোষণা</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span class="en-inline">Stay up to date with the latest information from BAUET Help Desk</span>
+        <span class="bn-inline">বাউয়েট হেল্প ডেস্কের সর্বশেষ তথ্য থেকে আপডেট থাকুন</span>
+      </p>
+    </div>
+    <div class="hero-gold-line"></div>
+  </section>
+
+  <!-- ═══ NOTICES SECTION ═══ -->
+  <section class="content-section" id="notices">
+    <div class="container">
+
+      <div class="section-heading">
+        <h2 class="section-title">
+          <span class="en-inline">Notices</span>
+          <span class="bn-inline">নোটিশ</span>
+        </h2>
+        <div class="section-title-line"></div>
+      </div>
+
+      <!-- Search bar -->
+      <div class="search-wrap">
+        <input
+          class="search-input"
+          type="text"
+          id="notice-search"
+          placeholder="Search notices..."
+          oninput="filterNotices(this.value)"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Loading spinner -->
+      <div id="notices-spinner" class="spinner-wrap">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Notices list -->
+      <div id="notices-list"></div>
+
+    </div>
+  </section>
+
+  <!-- ═══ FAQ SECTION ═══ -->
+  <section class="content-section content-section-alt" id="faqs">
+    <div class="container">
+
+      <div class="section-heading">
+        <h2 class="section-title">
+          <span class="en-inline">Frequently Asked Questions</span>
+          <span class="bn-inline">সচরাচর জিজ্ঞাসা</span>
+        </h2>
+        <div class="section-title-line"></div>
+      </div>
+
+      <!-- Category tabs -->
+      <div class="faq-tabs" id="faq-tabs">
+        <button class="faq-tab active" data-cat="all" onclick="filterFaqs('all', this)">
+          <span class="en-inline">All</span><span class="bn-inline">সব</span>
+        </button>
+        <button class="faq-tab" data-cat="Academic" onclick="filterFaqs('Academic', this)">
+          <span class="en-inline">Academic</span><span class="bn-inline">একাডেমিক</span>
+        </button>
+        <button class="faq-tab" data-cat="Hostel" onclick="filterFaqs('Hostel', this)">
+          <span class="en-inline">Hostel</span><span class="bn-inline">হোস্টেল</span>
+        </button>
+        <button class="faq-tab" data-cat="Registration" onclick="filterFaqs('Registration', this)">
+          <span class="en-inline">Registration</span><span class="bn-inline">নিবন্ধন</span>
+        </button>
+        <button class="faq-tab" data-cat="IT Support" onclick="filterFaqs('IT Support', this)">
+          <span class="en-inline">IT Support</span><span class="bn-inline">আইটি</span>
+        </button>
+        <button class="faq-tab" data-cat="General" onclick="filterFaqs('General', this)">
+          <span class="en-inline">General</span><span class="bn-inline">সাধারণ</span>
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div id="faq-spinner" class="spinner-wrap">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- FAQ accordion -->
+      <div id="faq-list"></div>
+
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo" style="margin-bottom:16px">
+          <div class="logo-emblem">
+            <img src="assets/images/bauet-logo.png" alt="BAUET"/>
+          </div>
+          <div class="logo-text">
+            <div class="logo-name">BAUET</div>
+            <div class="logo-sub">
+              <span class="en-inline">Help Desk</span>
+              <span class="bn-inline">হেল্প ডেস্ক</span>
+            </div>
+          </div>
+        </div>
+        <p class="footer-about">
+          <span class="en-inline">Bangladesh Army University of Engineering &amp; Technology's official student support platform.</span>
+          <span class="bn-inline">বাংলাদেশ আর্মি ইউনিভার্সিটি অব ইঞ্জিনিয়ারিং অ্যান্ড টেকনোলজির অফিসিয়াল শিক্ষার্থী সহায়তা প্ল্যাটফর্ম।</span>
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>
+          <span class="en-inline">Quick Links</span>
+          <span class="bn-inline">দ্রুত লিংক</span>
+        </h4>
+        <ul class="footer-links">
+          <li><a href="index.html"><span class="en-inline">Home</span><span class="bn-inline">হোম</span></a></li>
+          <li><a href="notices.html"><span class="en-inline">Notices</span><span class="bn-inline">নোটিশ</span></a></li>
+          <li><a href="notices.html#faqs"><span class="en-inline">FAQs</span><span class="bn-inline">প্রশ্নোত্তর</span></a></li>
+          <li><a href="auth.html"><span class="en-inline">Login</span><span class="bn-inline">লগইন</span></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>
+          <span class="en-inline">Student Access</span>
+          <span class="bn-inline">শিক্ষার্থী প্রবেশ</span>
+        </h4>
+        <ul class="footer-links">
+          <li><a href="auth.html?tab=register"><span class="en-inline">Create Account</span><span class="bn-inline">অ্যাকাউন্ট তৈরি</span></a></li>
+          <li><a href="student-dashboard.html"><span class="en-inline">Submit Ticket</span><span class="bn-inline">টিকেট জমা দিন</span></a></li>
+          <li><a href="auth.html"><span class="en-inline">Sign In</span><span class="bn-inline">সাইন ইন</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span class="footer-copy">
+        © 2026 BAUET Help Desk.
+        <span class="en-inline">All rights reserved.</span>
+        <span class="bn-inline">সর্বস্বত্ব সংরক্ষিত।</span>
+      </span>
+      <span class="footer-gold-star">BAUET · NATORE · BANGLADESH · ★</span>
+    </div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/notices.js"></script>
+</body>
+</html>
