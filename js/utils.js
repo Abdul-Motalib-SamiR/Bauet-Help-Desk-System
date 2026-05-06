@@ -126,3 +126,19 @@ function roleLabel(role, lang) {
     var l = lang || currentLang;
     return (map[role] && map[role][l]) ? map[role][l] : role;
 }
+
+// ── Global network error handler ──────────────
+window.addEventListener('unhandledrejection', function(event) {
+    if (!event.reason) return;
+    var msg = event.reason.message || '';
+    var isFetch = msg.toLowerCase().includes('fetch') ||
+                  msg.toLowerCase().includes('network') ||
+                  msg.toLowerCase().includes('failed to fetch');
+    if (isFetch) {
+        showToast(
+            'Connection Error',
+            'Could not reach the server. Check your internet connection.',
+            'error'
+        );
+    }
+});
