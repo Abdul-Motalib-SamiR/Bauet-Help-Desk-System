@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAUET Help Desk | Authority Dashboard</title>
+  <link rel="icon" type="image/png" href="assets/images/bauet-logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@300;400;600&family=Noto+Sans+Bengali:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/dashboard-base.css"/>
+</head>
+<body>
+
+<div class="toast" id="toast">
+  <div class="toast-title" id="toast-title"></div>
+  <div class="toast-msg"   id="toast-msg"></div>
+</div>
+
+<!-- Read-only ticket detail modal -->
+<div class="modal-overlay" id="ticket-modal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-ticket-no"></div>
+        <div style="font-size:0.78rem;color:var(--cream-dim);margin-top:3px" id="modal-meta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px" id="modal-badges"></div>
+      <div style="font-family:'Cinzel',serif;font-size:1rem;color:var(--cream);margin-bottom:8px" id="modal-title"></div>
+      <div style="font-size:0.9rem;color:var(--cream-dim);line-height:1.7;padding:14px;background:rgba(27,50,16,0.3);border:1px solid var(--green-border);margin-bottom:24px" id="modal-desc"></div>
+      <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:2px;color:var(--gold-dim);margin-bottom:14px">— REPLY THREAD —</div>
+      <div class="thread-wrap" id="thread-wrap">
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+      </div>
+      <!-- No reply input — read-only -->
+      <div style="margin-top:20px;padding:12px 16px;background:rgba(200,168,75,0.04);border:1px solid rgba(200,168,75,0.1);font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:1px;color:var(--gold-dim);text-align:center">
+        VIEW ONLY — AUTHORITY CANNOT REPLY TO TICKETS
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dash-layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-img">
+        <img src="assets/images/bauet-logo.png" alt="BAUET"/>
+      </div>
+      <div class="sidebar-logo-text">
+        <div class="t1">BAUET</div>
+        <div class="t2">
+          <span class="en-text">Authority Panel</span>
+          <span class="bn-text">কর্তৃপক্ষ প্যানেল</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">
+        <span class="en-text">Navigation</span>
+        <span class="bn-text">নেভিগেশন</span>
+      </div>
+      <button class="nav-item active" onclick="showSection('overview', this)">
+        <span class="nav-item-icon">🏠</span>
+        <span class="en-text">Overview</span>
+        <span class="bn-text">সারসংক্ষেপ</span>
+      </button>
+      <button class="nav-item" onclick="showSection('tickets', this)">
+        <span class="nav-item-icon">🎫</span>
+        <span class="en-text">All Tickets</span>
+        <span class="bn-text">সব টিকেট</span>
+      </button>
+      <button class="nav-item" onclick="showSection('unresolved', this)">
+        <span class="nav-item-icon">⚠️</span>
+        <span class="en-text">Open / Unresolved</span>
+        <span class="bn-text">খোলা / অমীমাংসিত</span>
+      </button>
+      <button class="nav-item" onclick="showSection('notices', this)">
+        <span class="nav-item-icon">📢</span>
+        <span class="en-text">Notices</span>
+        <span class="bn-text">নোটিশ</span>
+      </button>
+      <button class="nav-item" onclick="showSection('profile', this)">
+        <span class="nav-item-icon">👤</span>
+        <span class="en-text">My Profile</span>
+        <span class="bn-text">আমার প্রোফাইল</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-info">
+          <div class="u-name" id="user-name">Loading...</div>
+          <div class="u-role">
+            <span class="en-text">Authority</span>
+            <span class="bn-text">কর্তৃপক্ষ</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">
+        <span class="en-text">Sign Out</span>
+        <span class="bn-text">সাইন আউট</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN CONTENT ═══════════ -->
+  <div class="main-content">
+
+    <header class="top-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="page-title" id="header-title">
+          <span class="en-text">Overview</span>
+          <span class="bn-text">সারসংক্ষেপ</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="lang-toggle">
+          <button class="lang-btn active" onclick="setLang('en')">EN</button>
+          <button class="lang-btn"        onclick="setLang('bn')">বাং</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- ══════ OVERVIEW ══════ -->
+      <div class="page-section active" id="section-overview">
+        <div class="section-heading">
+          <div>
+            <div class="section-title" id="welcome-title">Authority Dashboard</div>
+            <div class="section-subtitle">
+              <span class="en-text">System-wide ticket oversight and statistics</span>
+              <span class="bn-text">সিস্টেম-ব্যাপী টিকেট তদারকি ও পরিসংখ্যান</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 stat cards -->
+        <div class="stats-row">
+          <div class="stat-card stat-total">
+            <div class="stat-num" id="stat-total">—</div>
+            <div class="stat-label">
+              <span class="en-text">Total Tickets</span>
+              <span class="bn-text">মোট টিকেট</span>
+            </div>
+          </div>
+          <div class="stat-card stat-open">
+            <div class="stat-num" id="stat-open">—</div>
+            <div class="stat-label">
+              <span class="en-text">Open</span>
+              <span class="bn-text">খোলা</span>
+            </div>
+          </div>
+          <div class="stat-card stat-progress">
+            <div class="stat-num" id="stat-progress">—</div>
+            <div class="stat-label">
+              <span class="en-text">In Progress</span>
+              <span class="bn-text">চলমান</span>
+            </div>
+          </div>
+          <div class="stat-card stat-resolved">
+            <div class="stat-num" id="stat-month">—</div>
+            <div class="stat-label">
+              <span class="en-text">Resolved This Month</span>
+              <span class="bn-text">এই মাসে সমাধান</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tickets by category + by status side by side -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="en-text">Tickets by Category</span>
+                <span class="bn-text">বিভাগ অনুযায়ী টিকেট</span>
+              </div>
+            </div>
+            <div id="category-breakdown">
+              <div class="spinner-wrap"><div class="spinner"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="en-text">Tickets by Status</span>
+                <span class="bn-text">স্ট্যাটাস অনুযায়ী টিকেট</span>
+              </div>
+            </div>
+            <div id="status-breakdown">
+              <div class="spinner-wrap"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="en-text">Recent Activity — Last 10 Tickets</span>
+              <span class="bn-text">সাম্প্রতিক কার্যক্রম — শেষ ১০টি টিকেট</span>
+            </div>
+          </div>
+          <div id="recent-body">
+            <div class="spinner-wrap"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ ALL TICKETS ══════ -->
+      <div class="page-section" id="section-tickets">
+        <div class="section-heading">
+          <div>
+            <div class="section-title">
+              <span class="en-text">All Tickets</span>
+              <span class="bn-text">সব টিকেট</span>
+            </div>
+            <div class="section-subtitle">
+              <span class="en-text">System-wide view — click any row to inspect</span>
+              <span class="bn-text">সিস্টেম-ব্যাপী দৃশ্য — বিস্তারিত দেখতে যেকোনো সারিতে ক্লিক করুন</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="toolbar">
+              <!-- Status filters -->
+              <button class="toolbar-filter active" onclick="filterAllTickets('status','all',this)">
+                <span class="en-text">All</span><span class="bn-text">সব</span>
+              </button>
+              <button class="toolbar-filter" onclick="filterAllTickets('status','open',this)">
+                <span class="en-text">Open</span><span class="bn-text">খোলা</span>
+              </button>
+              <button class="toolbar-filter" onclick="filterAllTickets('status','in_progress',this)">
+                <span class="en-text">In Progress</span><span class="bn-text">চলমান</span>
+              </button>
+              <button class="toolbar-filter" onclick="filterAllTickets('status','resolved',this)">
+                <span class="en-text">Resolved</span><span class="bn-text">সমাধান</span>
+              </button>
+              <button class="toolbar-filter" onclick="filterAllTickets('status','closed',this)">
+                <span class="en-text">Closed</span><span class="bn-text">বন্ধ</span>
+              </button>
+              <!-- Priority filters -->
+              <button class="toolbar-filter" onclick="filterAllTickets('priority','high',this)" style="margin-left:8px">
+                <span class="en-text">High</span><span class="bn-text">উচ্চ</span>
+              </button>
+              <button class="toolbar-filter" onclick="filterAllTickets('priority','urgent',this)">
+                <span class="en-text">Urgent</span><span class="bn-text">জরুরি</span>
+              </button>
+            </div>
+          </div>
+          <div id="all-tickets-body">
+            <div class="spinner-wrap"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ OPEN / UNRESOLVED ══════ -->
+      <div class="page-section" id="section-unresolved">
+        <div class="section-heading">
+          <div>
+            <div class="section-title">
+              <span class="en-text">Open / Unresolved Tickets</span>
+              <span class="bn-text">খোলা / অমীমাংসিত টিকেট</span>
+            </div>
+            <div class="section-subtitle">
+              <span class="en-text">Sorted by oldest first — tickets waiting the longest</span>
+              <span class="bn-text">সবচেয়ে পুরনো প্রথমে সাজানো — দীর্ঘতম অপেক্ষমাণ টিকেট</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div id="unresolved-body">
+            <div class="spinner-wrap"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ NOTICES ══════ -->
+      <div class="page-section" id="section-notices">
+        <div class="section-heading">
+          <div>
+            <div class="section-title">
+              <span class="en-text">Official Notices</span>
+              <span class="bn-text">অফিসিয়াল নোটিশ</span>
+            </div>
+            <div class="section-subtitle">
+              <span class="en-text">Read-only — contact an officer to post new notices</span>
+              <span class="bn-text">পাঠযোগ্য মাত্র — নতুন নোটিশের জন্য অফিসারের সাথে যোগাযোগ করুন</span>
+            </div>
+          </div>
+        </div>
+        <div id="notices-body">
+          <div class="spinner-wrap"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- ══════ PROFILE ══════ -->
+      <div class="page-section" id="section-profile">
+        <div class="section-heading">
+          <div>
+            <div class="section-title">
+              <span class="en-text">My Profile</span>
+              <span class="bn-text">আমার প্রোফাইল</span>
+            </div>
+            <div class="section-subtitle">
+              <span class="en-text">Your account information</span>
+              <span class="bn-text">আপনার অ্যাকাউন্ট তথ্য</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="max-width:520px" id="profile-card">
+          <div class="spinner-wrap"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /dash-layout -->
+
+<script src="js/utils.js"></script>
+<script src="js/authority.js"></script>
+</body>
+</html>
